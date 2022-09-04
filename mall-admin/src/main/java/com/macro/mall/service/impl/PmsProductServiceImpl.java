@@ -70,6 +70,7 @@ public class PmsProductServiceImpl implements PmsProductService {
     public int create(PmsProductParam productParam) {
         int count;
         //创建商品
+        // 这里的赋值应该是为了复制一个对象出来，避免插入数据后影响当前对象的值。但是这种直接赋值的方式应该是赋值了一个引用吧，这样是否还能达到那种效果？
         PmsProduct product = productParam;
         product.setId(null);
         productMapper.insertSelective(product);
@@ -96,19 +97,19 @@ public class PmsProductServiceImpl implements PmsProductService {
     }
 
     private void handleSkuStockCode(List<PmsSkuStock> skuStockList, Long productId) {
-        if(CollectionUtils.isEmpty(skuStockList))return;
+        if(CollectionUtils.isEmpty(skuStockList)) {
+            return;
+        }
         for(int i=0;i<skuStockList.size();i++){
             PmsSkuStock skuStock = skuStockList.get(i);
             if(StrUtil.isEmpty(skuStock.getSkuCode())){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                StringBuilder sb = new StringBuilder();
-                //日期
-                sb.append(sdf.format(new Date()));
-                //四位商品id
-                sb.append(String.format("%04d", productId));
-                //三位索引id
-                sb.append(String.format("%03d", i+1));
-                skuStock.setSkuCode(sb.toString());
+                String sb = sdf.format(new Date()) +
+                        //四位商品id
+                        String.format("%04d", productId) +
+                        //三位索引id
+                        String.format("%03d", i + 1);
+                skuStock.setSkuCode(sb);
             }
         }
     }
@@ -310,7 +311,9 @@ public class PmsProductServiceImpl implements PmsProductService {
      */
     private void relateAndInsertList(Object dao, List dataList, Long productId) {
         try {
-            if (CollectionUtils.isEmpty(dataList)) return;
+            if (CollectionUtils.isEmpty(dataList)) {
+                return;
+            }
             for (Object item : dataList) {
                 Method setId = item.getClass().getMethod("setId", Long.class);
                 setId.invoke(item, (Long) null);
