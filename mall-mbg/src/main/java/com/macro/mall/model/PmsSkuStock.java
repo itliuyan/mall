@@ -125,6 +125,13 @@ public class PmsSkuStock implements Serializable {
         this.spData = spData;
     }
 
+    public static PmsSkuStock empty() {
+        PmsSkuStock pmsSkuStock = new PmsSkuStock();
+        pmsSkuStock.setStock(0);
+        pmsSkuStock.setLockStock(0);
+        return pmsSkuStock;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
